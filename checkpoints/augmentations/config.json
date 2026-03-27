@@ -1,0 +1,16 @@
+{
+  "seed": 42,
+  "epochs": 10,
+  "batch_size": 16,
+  "lr": 0.0001,
+  "weight_decay": 1e-05,
+  "margin": 0.5,
+  "data_dir": "data/dataset/CUFS",
+  "checkpoint_dir": "checkpoints",
+  "experiment_name": "augmentations",
+  "use_amp": false,
+  "patience": 15,
+  "warmup_epochs": 5,
+  "device": "cpu",
+  "num_params": 45297518
+}

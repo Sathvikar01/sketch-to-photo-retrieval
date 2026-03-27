@@ -1,0 +1,35 @@
+{
+  "timestamp": "20260327_002929",
+  "experiments": [
+    {
+      "name": "baseline",
+      "status": "failed",
+      "error": "Traceback (most recent call last):\n  File \"C:\\Users\\arsat\\OneDrive\\Documents\\Desktop\\xaip\\train.py\", line 16, in <module>\n    from model import PseudoSiameseNet\n  File \"C:\\Users\\arsat\\OneDrive\\Documents\\Desktop\\xaip\\model.py\", line 3, in <module>\n    from facenet_pytorch import InceptionResnetV1\nModuleNotFoundError: No module named 'facenet_pytorch'\n",
+      "duration": 7.922381639480591
+    },
+    {
+      "name": "augmentations",
+      "status": "failed",
+      "error": "Traceback (most recent call last):\n  File \"C:\\Users\\arsat\\OneDrive\\Documents\\Desktop\\xaip\\train.py\", line 16, in <module>\n    from model import PseudoSiameseNet\n  File \"C:\\Users\\arsat\\OneDrive\\Documents\\Desktop\\xaip\\model.py\", line 3, in <module>\n    from facenet_pytorch import InceptionResnetV1\nModuleNotFoundError: No module named 'facenet_pytorch'\n",
+      "duration": 5.551745891571045
+    },
+    {
+      "name": "hard_mining",
+      "status": "failed",
+      "error": "Traceback (most recent call last):\n  File \"C:\\Users\\arsat\\OneDrive\\Documents\\Desktop\\xaip\\train.py\", line 16, in <module>\n    from model import PseudoSiameseNet\n  File \"C:\\Users\\arsat\\OneDrive\\Documents\\Desktop\\xaip\\model.py\", line 3, in <module>\n    from facenet_pytorch import InceptionResnetV1\nModuleNotFoundError: No module named 'facenet_pytorch'\n",
+      "duration": 5.105343818664551
+    },
+    {
+      "name": "scheduler",
+      "status": "failed",
+      "error": "Traceback (most recent call last):\n  File \"C:\\Users\\arsat\\OneDrive\\Documents\\Desktop\\xaip\\train.py\", line 16, in <module>\n    from model import PseudoSiameseNet\n  File \"C:\\Users\\arsat\\OneDrive\\Documents\\Desktop\\xaip\\model.py\", line 3, in <module>\n    from facenet_pytorch import InceptionResnetV1\nModuleNotFoundError: No module named 'facenet_pytorch'\n",
+      "duration": 5.962535619735718
+    },
+    {
+      "name": "full_stack",
+      "status": "failed",
+      "error": "Traceback (most recent call last):\n  File \"C:\\Users\\arsat\\OneDrive\\Documents\\Desktop\\xaip\\train.py\", line 16, in <module>\n    from model import PseudoSiameseNet\n  File \"C:\\Users\\arsat\\OneDrive\\Documents\\Desktop\\xaip\\model.py\", line 3, in <module>\n    from facenet_pytorch import InceptionResnetV1\nModuleNotFoundError: No module named 'facenet_pytorch'\n",
+      "duration": 5.16903281211853
+    }
+  ]
+}
