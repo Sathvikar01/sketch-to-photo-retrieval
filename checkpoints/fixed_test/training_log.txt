@@ -1,0 +1,14 @@
+[2026-03-28 23:24:54] Starting training: fixed_test
+[2026-03-28 23:24:54] Device: cpu
+[2026-03-28 23:24:54] Use projection: False
+[2026-03-28 23:24:54] Embedding dim: 512
+[2026-03-28 23:24:54] Training samples: 268
+[2026-03-28 23:26:09] Epoch 1/5 | Loss: 0.0765 | LR: 0.000100 | Time: 73.8s
+[2026-03-28 23:27:24] Epoch 2/5 | Loss: 0.0292 | LR: 0.000090 | Time: 73.4s
+[2026-03-28 23:28:39] Epoch 3/5 | Loss: 0.0223 | LR: 0.000065 | Time: 74.3s
+[2026-03-28 23:29:54] Epoch 4/5 | Loss: 0.0172 | LR: 0.000035 | Time: 73.7s
+[2026-03-28 23:31:11] Epoch 5/5 | Loss: 0.0090 | LR: 0.000010 | Time: 75.4s
+[2026-03-28 23:32:10]  Val Recall@1: 0.5355 | Recall@5: 0.8462 | MRR: 0.6631
+[2026-03-28 23:32:10]  New best model saved! Recall@1: 0.5355
+[2026-03-28 23:32:10] Training complete! Total time: 0.12 hours
+[2026-03-28 23:32:10] Best Recall@1: 0.5355
