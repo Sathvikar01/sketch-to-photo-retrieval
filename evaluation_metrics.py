@@ -10,7 +10,7 @@ import json
 import matplotlib.pyplot as plt
 from typing import Dict, List, Tuple, Optional
 
-DATA_DIR = 'data/dataset/CUFS'
+DATA_DIR = 'data/dataset/CUFS_reorganized'
 GALLERY_DB_PATH = 'gallery_db.pt'
 MODEL_CHECKPOINT = 'checkpoints/pseudo_siamese.pth'
 RESULTS_PATH = 'evaluation_results.json'
@@ -21,24 +21,24 @@ device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 def load_test_pairs(data_dir: str = DATA_DIR) -> List[Tuple[str, str, str]]:
     """
     Load test sketch-photo pairs from CUFS dataset.
-    
+
     Returns:
-        List of tuples: (sketch_path, photo_path, photo_id)
+    List of tuples: (sketch_path, photo_path, photo_id)
     """
-    test_sketches_dir = os.path.join(data_dir, 'test_sketches')
-    test_photos_dir = os.path.join(data_dir, 'test_photos')
-    
+    test_sketches_dir = os.path.join(data_dir, 'test', 'sketches')
+    test_photos_dir = os.path.join(data_dir, 'test', 'photos')
+
     sketch_files = glob.glob(os.path.join(test_sketches_dir, '*'))
     sketch_files = [f for f in sketch_files if f.lower().endswith(('.jpg', '.jpeg', '.png'))]
-    
+
     pairs = []
     for sketch_path in sketch_files:
         sketch_name = os.path.basename(sketch_path)
         base = os.path.splitext(sketch_name)[0]
-        
-        for suffix in ['_Sz', '-1', '_sketch']:
+
+        for suffix in ['_Sz', '-1', '_sketch', '_syn_pencil', '_syn_edge', '_syn_xdog']:
             base = base.replace(suffix, '')
-        
+
         photo_found = False
         for ext in ['.jpg', '.jpeg', '.png', '.JPG', '.JPEG', '.PNG']:
             photo_path = os.path.join(test_photos_dir, base + ext)
@@ -46,7 +46,7 @@ def load_test_pairs(data_dir: str = DATA_DIR) -> List[Tuple[str, str, str]]:
                 pairs.append((sketch_path, photo_path, base + ext))
                 photo_found = True
                 break
-        
+
         if not photo_found:
             direct_path = os.path.join(test_photos_dir, sketch_name)
             if os.path.exists(direct_path):

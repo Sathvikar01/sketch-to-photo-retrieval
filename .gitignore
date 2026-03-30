@@ -3,3 +3,27 @@ __pycache__/
 *.pyc
 .ipynb_checkpoints/
 nul
+
+# Exclude vit folder and related files
+vit/
+vit_*/
+*.vit*
+
+# Exclude large checkpoint files (keep config and best model)
+checkpoints/*/final_model.pth
+checkpoints/*/optimizer_*.pth
+checkpoints/*/gallery_db_test.pt
+checkpoints/expanded_v1/
+
+# Exclude large data files
+data/dataset/CUFS_reorganized/train/synthetic_sketches/
+*.pt
+!checkpoints/*/best_model.pth
+
+# Exclude generated plots
+cmc_curve.png
+rank_distribution.png
+
+# Exclude temporary files
+evaluation_results.json
+gallery_db_reorganized.pt

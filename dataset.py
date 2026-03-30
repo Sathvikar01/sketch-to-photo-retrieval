@@ -12,24 +12,27 @@ class CUFSDataset(Dataset):
     """
     CUFS Dataset loader for Cross-Modal Sketch to Photo matching.
     Returns anchor (sketch), positive (matching photo), and negative (non-matching photo).
-    
+
     Enhanced with:
     - Robust file handling (supports .jpg, .png)
     - Modality-aware augmentations
     - Hard negative sampling hooks
+    - Support for synthetic sketches
     """
-    
-    def __init__(self, data_dir, split='train', mtcnn=None, 
+
+    def __init__(self, data_dir, split='train', mtcnn=None,
                  sketch_transform=None, photo_transform=None,
-                 hard_negatives=False):
+                 hard_negatives=False, use_synthetic=True):
         self.data_dir = data_dir
         self.split = split
         self.mtcnn = mtcnn
         self.hard_negatives = hard_negatives
-        
-        self.sketches_dir = os.path.join(data_dir, f'{split}_sketches')
-        self.photos_dir = os.path.join(data_dir, f'{split}_photos')
-        
+        self.use_synthetic = use_synthetic
+
+        self.sketches_dir = os.path.join(data_dir, split, 'sketches')
+        self.photos_dir = os.path.join(data_dir, split, 'photos')
+        self.synthetic_dir = os.path.join(data_dir, split, 'synthetic_sketches')
+
         self.filenames = self._get_matched_filenames()
         
         self.sketch_transform = sketch_transform or self._get_default_sketch_transform()
@@ -41,33 +44,37 @@ class CUFSDataset(Dataset):
         sketch_files = glob.glob(os.path.join(self.sketches_dir, '*'))
         sketch_files = [f for f in sketch_files if f.lower().endswith(('.jpg', '.jpeg', '.png'))]
         
+        if self.use_synthetic and os.path.exists(self.synthetic_dir) and self.split == 'train':
+            synthetic_files = glob.glob(os.path.join(self.synthetic_dir, '*'))
+            synthetic_files = [f for f in synthetic_files if f.lower().endswith(('.jpg', '.jpeg', '.png'))]
+            sketch_files.extend(synthetic_files)
+
         matched = []
         for sketch_path in sketch_files:
             sketch_name = os.path.basename(sketch_path)
-            photo_path = os.path.join(self.photos_dir, sketch_name)
-            if os.path.exists(photo_path):
-                matched.append(sketch_name)
-            else:
-                base = os.path.splitext(sketch_name)[0]
-                for ext in ['.jpg', '.jpeg', '.png']:
-                    alt_path = os.path.join(self.photos_dir, base + ext)
-                    if os.path.exists(alt_path):
-                        matched.append(sketch_name)
-                        break
-        
+            base = os.path.splitext(sketch_name)[0]
+            for suffix in ['_Sz', '-1', '_sketch', '_syn_pencil', '_syn_edge', '_syn_xdog']:
+                base = base.replace(suffix, '')
+            
+            for ext in ['.jpg', '.jpeg', '.png', '.JPG', '.JPEG', '.PNG']:
+                photo_path = os.path.join(self.photos_dir, base + ext)
+                if os.path.exists(photo_path):
+                    matched.append((sketch_name, base + ext))
+                    break
+
         return sorted(matched)
     
     def _build_id_mapping(self):
         self.id_to_indices = {}
-        for idx, fname in enumerate(self.filenames):
-            base_id = self._get_person_id(fname)
+        for idx, (sketch_name, photo_name) in enumerate(self.filenames):
+            base_id = self._get_person_id(photo_name)
             if base_id not in self.id_to_indices:
                 self.id_to_indices[base_id] = []
             self.id_to_indices[base_id].append(idx)
-    
+
     def _get_person_id(self, filename):
         base = os.path.splitext(filename)[0]
-        for suffix in ['_Sz', '-1', '_sketch', '_photo']:
+        for suffix in ['_Sz', '-1', '_sketch', '_syn_pencil', '_syn_edge', '_syn_xdog']:
             base = base.replace(suffix, '')
         return base
     
@@ -93,19 +100,22 @@ class CUFSDataset(Dataset):
         return len(self.filenames)
     
     def __getitem__(self, idx):
-        filename = self.filenames[idx]
+        sketch_name, photo_name = self.filenames[idx]
+
+        sketch_path = os.path.join(self.sketches_dir, sketch_name)
+        if not os.path.exists(sketch_path) and self.use_synthetic:
+            sketch_path = os.path.join(self.synthetic_dir, sketch_name)
         
-        sketch_path = os.path.join(self.sketches_dir, filename)
-        photo_path = self._find_photo_path(filename)
-        
+        photo_path = os.path.join(self.photos_dir, photo_name)
+
         neg_idx = self._sample_negative(idx)
-        neg_filename = self.filenames[neg_idx]
-        neg_photo_path = self._find_photo_path(neg_filename)
-        
+        neg_sketch_name, neg_photo_name = self.filenames[neg_idx]
+        neg_photo_path = os.path.join(self.photos_dir, neg_photo_name)
+
         sketch = Image.open(sketch_path).convert('RGB')
         photo = Image.open(photo_path).convert('RGB')
         neg_photo = Image.open(neg_photo_path).convert('RGB')
-        
+
         if self.mtcnn is not None:
             sketch = self._apply_mtcnn(sketch, self.sketch_transform)
             photo = self._apply_mtcnn(photo, self.photo_transform)
@@ -114,7 +124,7 @@ class CUFSDataset(Dataset):
             sketch = self.sketch_transform(sketch)
             photo = self.photo_transform(photo)
             neg_photo = self.photo_transform(neg_photo)
-        
+
         return sketch, photo, neg_photo, idx
     
     def _find_photo_path(self, filename):

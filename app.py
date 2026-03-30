@@ -18,9 +18,9 @@ from gradcam import (
 )
 
 # Configs
-GALLERY_DB_PATH = 'gallery_db.pt'
-MODEL_CHECKPOINT = 'checkpoints/pseudo_siamese.pth'
-SKETCH_POOL_DIR = 'data/dataset/CUFS/test_sketches'
+GALLERY_DB_PATH = 'gallery_db_reorganized.pt'
+MODEL_CHECKPOINT = 'checkpoints/regularized_v1/best_model.pth'
+SKETCH_POOL_DIR = 'data/dataset/CUFS_reorganized/test/sketches'
 DEVICE = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
 # Cached Data Loaders

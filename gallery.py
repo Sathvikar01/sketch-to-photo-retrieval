@@ -7,9 +7,9 @@ from model import PseudoSiameseNet
 from facenet_pytorch import MTCNN
 from tqdm import tqdm
 
-DATA_DIR = 'data/dataset/CUFS/test_photos'
+DATA_DIR = 'data/dataset/CUFS_reorganized/test/photos'
 GALLERY_DB_PATH = 'gallery_db.pt'
-MODEL_CHECKPOINT = 'checkpoints/pseudo_siamese.pth'
+MODEL_CHECKPOINT = 'checkpoints/regularized_v1/best_model.pth'
 
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 

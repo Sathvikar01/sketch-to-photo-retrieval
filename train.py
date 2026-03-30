@@ -154,7 +154,7 @@ def main():
     parser.add_argument('--lr', type=float, default=1e-4, help='Learning rate')
     parser.add_argument('--weight_decay', type=float, default=1e-5, help='Weight decay')
     parser.add_argument('--margin', type=float, default=0.5, help='Triplet margin')
-    parser.add_argument('--data_dir', type=str, default='data/dataset/CUFS', help='Data directory')
+    parser.add_argument('--data_dir', type=str, default='data/dataset/CUFS_reorganized', help='Data directory')
     parser.add_argument('--checkpoint_dir', type=str, default='checkpoints', help='Checkpoint directory')
     parser.add_argument('--experiment_name', type=str, default='baseline', help='Experiment name')
     parser.add_argument('--use_amp', action='store_true', help='Use mixed precision')
