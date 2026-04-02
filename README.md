@@ -10,15 +10,73 @@ This project implements **LC3-GradCAM** (Landmark-Constrained Contrastive Cross-
 2. **Provides contrastive explanations** - positive (why match) and negative (why not match)
 3. **Uses dynamic landmark detection** - scores regions based on actual facial landmarks, not fixed coordinates
 
-## 📊 Baseline Results (CUFS Dataset)
+## 📊 Results
+
+### CUFS Dataset (60/30/10 Split)
+
+| Split | Size | Purpose |
+|-------|------|---------|
+| Training | 363 pairs (60%) | Model training |
+| Testing | 181 pairs (30%) | Evaluation |
+| Display | 62 pairs (10%) | UI demonstration |
+
+**Performance on Test Set (30% holdout):**
 
 | Metric | Value | 95% CI |
 |--------|-------|--------|
-| **Recall@1** | 49.70% | [44.38%, 55.03%] |
-| **Recall@5** | 81.95% | [77.81%, 86.39%] |
-| **Recall@10** | 87.57% | - |
-| **MRR** | 0.6398 | [0.5964, 0.6807] |
-| **Mean Rank** | 4.78 ± 8.74 | - |
+| **Recall@1** | 81.07% | [75.73%, 85.92%] |
+| **Recall@5** | 95.15% | [92.23%, 97.58%] |
+| **Recall@10** | 98.54% | - |
+| **MRR** | 0.8791 | [84.19%, 91.30%] |
+| **Mean Rank** | 1.59 ± 1.89 | - |
+| **Median Rank** | 1 | - |
+
+### Comparison with Previous Results
+
+| Metric | Previous (25 test pairs) | New (181 test pairs) | Improvement |
+|--------|-------------------------|---------------------|-------------|
+| Recall@1 | 49.70% | 81.07% | +31.37% |
+| Recall@5 | 81.95% | 95.15% | +13.20% |
+| MRR | 0.6398 | 0.8791 | +0.2393 |
+
+*Note: Previous results used a small 25-pair test set which may not have been representative. The new 30% holdout test set provides more reliable evaluation.*
+
+## 🗂️ Dataset Structure
+
+### CUFS (CUHK Face Sketch)
+```
+data/dataset/CUFS_reorganized/
+├── train/           (363 pairs - 60%)
+│   ├── photos/
+│   └── sketches/
+├── test/            (181 pairs - 30%)
+│   ├── photos/
+│   └── sketches/
+└── display/         (62 pairs - 10%)
+    ├── photos/
+    └── sketches/
+```
+
+### CUFSF (CUHK Face Sketch & Face - Extended)
+CUFSF extends CUFS with multiple photo variations per identity, testing robustness to lighting, expression, and pose changes.
+
+```
+data/dataset/CUFSF_reorganized/
+├── train/           (60%)
+│   ├── photos/
+│   │   └── person_id/
+│   │       ├── photo_1.jpg
+│   │       ├── photo_2.jpg  (variation)
+│   │       └── ...
+│   └── sketches/
+├── test/            (30%)
+└── display/         (10%)
+```
+
+**Note:** CUFSF requires download from CUHK. Run:
+```bash
+python download_cufsf.py
+```
 
 ## 🚀 Key Improvements Implemented
 
@@ -42,26 +100,31 @@ This project implements **LC3-GradCAM** (Landmark-Constrained Contrastive Cross-
 - `compute_dual_attribution()` - cross-modal correspondence
 - `analyze_landmark_regions()` - dynamic landmark-based scoring
 
+### 5. Proper Data Splitting (NEW)
+- **60% Training** - Model development
+- **30% Testing** - Final evaluation (unseen during training)
+- **10% Display** - UI demonstration (separate from test)
+
 ## 📁 Project Structure
 
 ```
 xaip/
 ├── model.py              # Pseudo-Siamese network architecture
-├── dataset.py            # CUFS dataset loader with augmentations
+├── dataset.py            # CUFS/CUFSF dataset loader
 ├── train.py              # Training script with all enhancements
 ├── gradcam.py            # LC3-GradCAM implementation
 ├── evaluation_metrics.py # Retrieval metrics + CMC + bootstrap CI
-├── gallery.py            # Gallery database generation
-├── app.py                # Streamlit demo interface
+├── gallery.py            # Gallery database generation (supports splits)
+├── app.py                # Streamlit demo interface (uses display split)
+├── reorganize_dataset.py # Dataset splitting (60/30/10)
+├── download_cufsf.py     # CUFSF download helper
 ├── run_ablations.py      # Ablation experiment runner
 ├── paper_draft.md        # Research paper draft
 └── data/
     └── dataset/
-        └── CUFS/
-            ├── train_sketches/
-            ├── train_photos/
-            ├── test_sketches/
-            └── test_photos/
+        ├── CUFS/
+        ├── CUFS_reorganized/
+        └── CUFSF/         (requires download)
 ```
 
 ## 🔧 Installation
@@ -71,7 +134,7 @@ xaip/
 python -m venv venv
 source venv/bin/activate  # Linux/Mac
 # or
-.\venv\Scripts\activate  # Windows
+.\venv\Scripts\activate   # Windows
 
 # Install dependencies
 pip install -r requirements.txt
@@ -79,13 +142,28 @@ pip install -r requirements.txt
 
 ## 🏃 Quick Start
 
-### 1. Generate Gallery Database
+### 1. Reorganize Dataset (60/30/10 split)
 
 ```bash
-python gallery.py
+# CUFS dataset
+python reorganize_dataset.py --dataset CUFS
+
+# CUFSF dataset (after download)
+python reorganize_dataset.py --dataset CUFSF
 ```
 
-### 2. Train Model
+### 2. Generate Gallery Databases
+
+```bash
+# Generate for all splits
+python gallery.py --all
+
+# Or specific splits
+python gallery.py --split display
+python gallery.py --split test
+```
+
+### 3. Train Model
 
 ```bash
 # Baseline training
@@ -95,17 +173,19 @@ python train.py --experiment_name baseline --epochs 10
 python train.py --experiment_name full_stack --epochs 50 --use_amp
 ```
 
-### 3. Evaluate
+### 4. Evaluate
 
 ```bash
 python evaluation_metrics.py
 ```
 
-### 4. Run Streamlit Demo
+### 5. Run Streamlit Demo
 
 ```bash
 streamlit run app.py
 ```
+
+The demo uses the **display split (10%)** for UI demonstrations, keeping test data separate for proper evaluation.
 
 ## 🧪 Running Ablation Experiments
 
@@ -156,7 +236,7 @@ See `paper_draft.md` for the complete manuscript draft including:
 - Related Work
 - Methodology (architecture, training, LC3-GradCAM)
 - Experimental Setup
-- Results Tables (to be filled after ablations)
+- Results Tables
 - Discussion and Limitations
 - References
 
@@ -172,6 +252,25 @@ The evaluation pipeline computes:
 Visualizations are automatically generated:
 - `cmc_curve.png` - Recognition rate vs. rank
 - `rank_distribution.png` - Histogram of correct match ranks
+
+## 🔄 Data Split Rationale
+
+### Why 60/30/10?
+
+| Split | Purpose | Why This Size? |
+|-------|---------|----------------|
+| **Train (60%)** | Model learning | Sufficient data for training |
+| **Test (30%)** | Evaluation | Large enough for reliable metrics |
+| **Display (10%)** | UI demo | Separate from test to avoid leakage |
+
+### Previous vs New Split
+
+| Aspect | Previous | New |
+|--------|----------|-----|
+| Test size | 25 pairs (fixed) | 181 pairs (30%) |
+| Display set | None (test used) | 62 pairs (10%) |
+| Evaluation reliability | Low (small sample) | High (large sample) |
+| Data leakage risk | High (test in UI) | None (separated) |
 
 ## 🤝 Citation
 

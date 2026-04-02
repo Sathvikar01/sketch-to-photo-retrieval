@@ -11,8 +11,8 @@ import matplotlib.pyplot as plt
 from typing import Dict, List, Tuple, Optional
 
 DATA_DIR = 'data/dataset/CUFS_reorganized'
-GALLERY_DB_PATH = 'gallery_db.pt'
-MODEL_CHECKPOINT = 'checkpoints/pseudo_siamese.pth'
+GALLERY_DB_PATH = 'gallery_db_test.pt'
+MODEL_CHECKPOINT = 'checkpoints/regularized_v1/best_model.pth'
 RESULTS_PATH = 'evaluation_results.json'
 
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
@@ -183,15 +183,19 @@ def evaluate_retrieval(model: Optional[PseudoSiameseNet] = None,
     if model is None:
         if verbose:
             print("Loading model...")
-        model = PseudoSiameseNet().to(device)
+        model = PseudoSiameseNet(pretrained='vggface2').to(device)
         if os.path.exists(model_checkpoint):
-            model.load_state_dict(torch.load(model_checkpoint, map_location=device))
+            checkpoint = torch.load(model_checkpoint, map_location=device)
+            if 'model_state_dict' in checkpoint:
+                model.load_state_dict(checkpoint['model_state_dict'])
+            else:
+                model.load_state_dict(checkpoint)
             if verbose:
                 print(f"Loaded checkpoint from {model_checkpoint}")
         else:
             if verbose:
                 print("Warning: No checkpoint found, using pretrained weights")
-    
+
     model.eval()
     
     transform = transforms.Compose([

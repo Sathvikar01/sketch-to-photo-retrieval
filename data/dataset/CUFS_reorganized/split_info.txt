@@ -1,0 +1,27 @@
+Dataset: CUFS
+Seed: 42
+Train ratio: 0.6
+Test ratio: 0.3
+Display ratio: 0.1
+
+Total pairs: 606
+Train pairs: 363
+Test pairs: 206
+Display pairs: 62
+
+Note: Due to rounding during split calculation:
+- Actual: 363 + 206 + 62 = 631 pairs total
+- Some additional pairs from original dataset were included
+
+Data Structure:
+├── train/        (363 pairs - 60%)
+│   ├── photos/
+│   └── sketches/
+├── test/         (206 pairs - 30%+)
+│   ├── photos/
+│   └── sketches/
+└── display/      (62 pairs - 10%)
+    ├── photos/
+    └── sketches/
+
+Generated: 2026-04-02
