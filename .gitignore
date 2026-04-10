@@ -3,3 +3,16 @@ __pycache__/
 *.pyc
 .ipynb_checkpoints/
 nul
+
+# Data directories (large files)
+data/colorferet/
+data/dataset/
+
+# Checkpoints (large model files)
+checkpoints/
+
+# Generated gallery files (can be regenerated)
+*.pt
+
+# Generated results
+*.json
